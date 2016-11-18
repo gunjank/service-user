@@ -9,3 +9,4 @@ applications:
   path: .
   services:
    - mongo_cb
+   - citi_auth

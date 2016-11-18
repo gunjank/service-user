@@ -4,6 +4,7 @@
   "description": "Rest service for  user data ",
   "main": "index.js",
   "dependencies": {
+    "base-64": "^0.1.0",
     "boom": "^2.8.0",
     "bunyan": "^1.8.1",
     "cfenv": "^1.0.3",

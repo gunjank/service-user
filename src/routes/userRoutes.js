@@ -153,4 +153,23 @@ module.exports = function (server, options) {
                 }
             }
         });
+        //get access token by providing authorization code
+        server.route({
+            method: 'post',
+            path: '/v1/user/authCode',
+            config: {
+                handler: userHandler.authCode,
+                description: 'Get an access token by passing auth code',
+                notes: 'You also get a refresh token that can be used to get a new access token in case the original one expires',
+                tags: ['api'],
+                validate: {
+                    payload: Joi.object().keys({
+                        grant_type: Joi.string().required(),
+                        code: Joi.string().required(),
+                        redirect_uri: Joi.string().required(),
+                        userId: Joi.string().required()
+                    })
+                }
+            }
+        });
     } //end of module.export function

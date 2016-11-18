@@ -68,6 +68,17 @@ let reporters = [new GoodFile({
   log: '*'
 }, __dirname + '/../logs/server.log')];
 
+//if you want to serve static files 
+server.route({
+  method: 'get',
+  path: '/{param*}',
+  handler: {
+    directory: {
+      path: __dirname + '/../src/ui',
+      listing: true
+    }
+  }
+});
 
 /**
  * Add logging

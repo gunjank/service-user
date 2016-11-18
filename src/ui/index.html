@@ -1,0 +1,70 @@
+<!DOCTYPE>
+<html>
+
+<head>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title>Citi Auth</title>
+</head>
+
+<body>
+    Citi Auth
+    <div id="msg">
+    </div>
+    <input type="button" name="closeBrowser" value="closeBrowser" onclick="requestCloseBrowser()">
+    <a href="javascript:window.open('','_self').close();">close</a>
+    <script>
+     var m= document.getElementById("msg");   
+    // var urlParam = location.search.substr(1).split("&").forEach(function(item) {   
+    //    m.innerHTML = m.innerHTML + "  <br> "+ item;
+
+    // });
+
+
+  var callAuthToken = true;
+
+function loadXMLDoc(code) {
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
+            callAuthToken =false;
+           if (xmlhttp.status == 200) {
+               m.innerHTML = m.innerHTML + "  <br> "+ xmlhttp.responseText;
+           }
+           else if (xmlhttp.status == 400) {
+              alert('There was an error 400');
+           }
+           else {
+               alert('something else other than 200 was returned');
+           }
+        }
+    };
+    var data={  "grant_type":"authorization_code","code":code,"userId":state,"redirect_uri":"https://service-user.cfapps.io" };
+    xmlhttp.open("POST", "/v1/user/authCode");
+    xmlhttp.setRequestHeader("Content-Type", "application/json");
+    xmlhttp.send(JSON.stringify(data));
+}
+
+var qs = (function(a) { if (a == "") return {}; var b = {}; for (var i = 0; i < a.length; ++i) { var p=a[i].split( '=', 2); if (p.length==1 ) b[p[0]]="" ; else b[p[0]]=decodeURIComponent(p[1].replace(/\+/g, " ")); } return b; })(window.location.search.substr(1).split('&'));
+var code = qs["code"];
+var state = qs["state"];
+
+if(callAuthToken==true){
+    if(code ==undefined || code =="" ){
+        m.innerHTML = m.innerHTML + "  <br> "+ "missing expected authorization code";
+
+    } else if(state ==undefined || state =="" )
+    {
+        m.innerHTML = m.innerHTML + "  <br> "+ "missing expected state";
+    } else{
+        loadXMLDoc(code,state);
+}
+}
+
+
+ 
+
+
+</script>
+</body>
+
+</html>
