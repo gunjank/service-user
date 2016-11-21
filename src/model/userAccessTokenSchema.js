@@ -5,7 +5,7 @@ var mongoose = require('../dao/db');
 let schema = new mongoose.Schema({
     "createdAt": {
         type: Date,
-        expires: 3530,
+        expires: 3530, //access token expires_in=3600
         default: Date.now
     }, //almost 1 minute few seconds  less than  one hour
     user_id: String,

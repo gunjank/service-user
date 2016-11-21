@@ -39,7 +39,7 @@ function loadXMLDoc(code) {
         }
     };
     var data={  "grant_type":"authorization_code","code":code,"userId":state,"redirect_uri":"https://service-user.cfapps.io" };
-    xmlhttp.open("POST", "/v1/user/authCode");
+    xmlhttp.open("POST", "/v1/user/accessToken");
     xmlhttp.setRequestHeader("Content-Type", "application/json");
     xmlhttp.send(JSON.stringify(data));
 }

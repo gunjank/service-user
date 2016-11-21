@@ -1,12 +1,7 @@
 'use strict';
 
-let bunyan = require('bunyan');
-//log class will now globally available
-global.log = bunyan.createLogger({
-  name: 'service-user'
-});
-
-let path = require('path'),
+let log = require('./config/logger'),
+  path = require('path'),
   Lout = require('lout'),
   Good = require('good'),
   GoodFile = require('good-file'),

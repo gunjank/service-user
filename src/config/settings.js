@@ -1,16 +1,21 @@
 'use strict';
 
 const cfenv = require("cfenv");
-let appEnv = cfenv.getAppEnv();
+const appEnv = cfenv.getAppEnv();
+const base64 = require('base-64');
+const log = require('./logger');
 let mLabService = appEnv.getService('mongo_cb');
 let citiAuth = appEnv.getService('citi_auth');
-let base64 = require('base-64');
+let mLabServiceUrl = "";
+let citiClientCredentials = null;
+let clientIdAndSecretBase64 = null;
 
-let mLabServiceCredentials = function () {
+
+const mLabServiceCredentials = function () {
     //** local testing **//
     if (mLabService == null) {
-        // log.error('mLabService not available, reading local hardcoded values');
-        let dummyData = require('./notToCommit');
+        log.error('mLabService not available, reading local hardcoded values');
+        const dummyData = require('./notToCommit');
         mLabService = {};
         mLabService.credentials = {};
         mLabService.credentials.uri = {};
@@ -18,12 +23,13 @@ let mLabServiceCredentials = function () {
     } else {
         log.info('mLabService  available, reading  service details');
     }
-    return mLabService.credentials.uri;
+    mLabServiceUrl = mLabService.credentials.uri;
 }
-let getAuthorizationBase64 = function () {
+
+const getCitiClientCredentials = function () {
     if (citiAuth == null) {
-        // log.error('citiAuthClientId or citiAuthClientSecret not available, reading local hardcoded values');
-        let dummyData = require('./notToCommit');
+        log.error('citiAuthClientId or citiAuthClientSecret not available, reading local hardcoded values');
+        const dummyData = require('./notToCommit');
         citiAuth = {};
         citiAuth.credentials = {};
         citiAuth.credentials.client_id = dummyData.client_id;
@@ -31,11 +37,20 @@ let getAuthorizationBase64 = function () {
     } else {
         log.info('citiAuthClientId and  citiAuthClientSecret are  available, reading  service details');
     }
-    //console.log(citiAuthClientId + ":" + citiAuthClientSecret);
-    return base64.encode(citiAuth.credentials.client_id + ":" + citiAuth.credentials.client_secret);
+    citiClientCredentials = citiAuth.credentials;
+}
+const getClientIdAndSecretBase64 = function () {
+    clientIdAndSecretBase64 = "Basic " + base64.encode(citiClientCredentials.client_id + ":" + citiClientCredentials.client_secret);
+}
+const initialize = function () { //intilize all bootstrapping credentials
+    getCitiClientCredentials();
+    getClientIdAndSecretBase64();
+    mLabServiceCredentials();
 }
 
-let settings = {
+
+const settings = {
+    init: initialize(), //this will make sure we have citiAuth credentials
     gbfsBase: 'https://gbfs.citibikenyc.com/gbfs/',
     gbfsFeed: 'gbfs.json',
     system_regions: 'en/system_regions.json',
@@ -43,10 +58,13 @@ let settings = {
     station_status: 'en/station_status.json',
     station_information: 'en/station_information.json',
     system_alerts: 'en/system_alerts.json',
-    mongoUrl: mLabServiceCredentials(),
-    authCodeUrl: 'https://sandbox.apihub.citi.com/gcb/api/authCode/oauth2/token/us/gcb',
-    citiAuthorization: getAuthorizationBase64(),
+    mongoUrl: mLabServiceUrl,
+    accessTokenUrl: 'https://sandbox.apihub.citi.com/gcb/api/authCode/oauth2/token/us/gcb',
+    accessTokenRefreshUrl: 'https://sandbox.apihub.citi.com/gcb/api/authCode/oauth2/refresh',
+    accessTokenRevokeUrl: 'https://sandbox.apihub.citi.com/gcb/api/authCode/oauth2/revoke',
+    citiAccountsApiUrl: 'https://sandbox.apihub.citi.com/gcb/api/v1/accounts',
+    citiClientIdAndSecretBasic: clientIdAndSecretBase64,
+    citiClientId: citiClientCredentials.client_id,
     port: process.env.PORT || 3001
 }
-
 module.exports = settings;

@@ -156,11 +156,11 @@ module.exports = function (server, options) {
         //get access token by providing authorization code
         server.route({
             method: 'post',
-            path: '/v1/user/authCode',
+            path: '/v1/user/accessToken',
             config: {
-                handler: userHandler.authCode,
-                description: 'Get an access token by passing auth code',
-                notes: 'You also get a refresh token that can be used to get a new access token in case the original one expires',
+                handler: userHandler.accessToken,
+                description: 'Insert/update access token and refresh token for given user id and auth code ',
+                notes: 'Redirect url should be same used for auth code',
                 tags: ['api'],
                 validate: {
                     payload: Joi.object().keys({
@@ -171,5 +171,24 @@ module.exports = function (server, options) {
                     })
                 }
             }
+        }); //end of access token route
+
+        //user address with type 
+        server.route({
+            method: 'get',
+            path: '/v1/user/{userId}/accounts',
+            config: {
+                handler: userHandler.getUserAccounts,
+                description: 'Returns a summary of all credit card accounts held by a Citi customer who has authorized your app',
+                notes: 'If a customer has multiple credit card accounts, e.g. a Citi® AAdvantage® Card and a Citi ThankYou® Card, the accounts will be returned in the array accountGroupSummary',
+                tags: ['api'],
+                validate: {
+                    params: {
+                        userId: Joi.string().required()
+                    }
+
+                }
+            }
         });
+
     } //end of module.export function
