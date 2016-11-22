@@ -400,7 +400,7 @@ module.exports = userHandler;
 //test
 let req = {
     params: {
-        userId: "1120350294667738"
+        userId: "11203502946677381"
     }
 };
 let reply = function (obj) {
