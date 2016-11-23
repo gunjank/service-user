@@ -47,7 +47,7 @@ const accessTokenRefresh = function (refresh_token, cb) {
     const response = new Response();
     refreshTokenPayload.grant_type = "refresh_token";
     refreshTokenPayload.refresh_token = refresh_token;
-    citiAuthHandler.authTokenRefresh(refreshTokenPayload, (error, body) => {
+    citiAuthHandler.authTokenRefresh(refreshTokenPayload, (error, jsonBody) => {
         if (error) {
             response.statusCode = 0;
             response.message = " Unable to receive access token from refresh service";
@@ -55,7 +55,7 @@ const accessTokenRefresh = function (refresh_token, cb) {
         } else {
             response.statusCode = 1;
             response.message = " Successfully called refresh access token";
-            response.data = JSON.parse(body);
+            response.data = jsonBody;
         }
         cb(response);
     });
@@ -98,7 +98,7 @@ const getUserHandler = (userId, cb) => {
     })
 }
 
-const insertUpdateAccessToken = (userId, accessToken, cb) => {
+const insertUpdateAccessToken = (userId, accessToken, refreshToken, cb) => {
     const response = new Response();
     const accessTokenPayload = {
         user_id: userId,
@@ -125,7 +125,18 @@ const insertUpdateAccessToken = (userId, accessToken, cb) => {
             response.message = " Saved latest data into user access_token";
             response.data = result;
         }
-        cb(response);
+        // whenever access_token update happens it is required to update refresh_token if available 
+        if (null != refreshToken) {
+            const userDataPayload = {};
+            userDataPayload.user_id = userId;
+            userDataPayload.refresh_token = refreshToken;
+            userCreateUpdateTransaction(userDataPayload, function (userCreateUpdateTransactionResponse) {
+                response.message = response.message + ", " + userCreateUpdateTransactionResponse.message;
+                cb(response);
+            });
+        } else {
+            cb(response);
+        }
     });
 }
 
@@ -135,7 +146,7 @@ const getAccountsWithRefreshTokenForGivenUserId = (userId, cb) => {
             accessTokenRefresh(response.data.refresh_token, (refreshTokenResponse) => {
                 if (refreshTokenResponse.statusCode === 1 && null != refreshTokenResponse.data.access_token) { //should have access token{
                     //insert access token into user access token collection
-                    insertUpdateAccessToken(userId, refreshTokenResponse.data.access_token, (insertUpdateAccessTokenResponse) => {
+                    insertUpdateAccessToken(userId, refreshTokenResponse.data.access_token, refreshTokenResponse.data.refresh_token, (insertUpdateAccessTokenResponse) => {
                         if (insertUpdateAccessTokenResponse.statusCode === 1) {
                             getUserAccountsHandler(refreshTokenResponse.data.access_token, (userAccountsHandlerResponse) => {
                                 cb(userAccountsHandlerResponse);
@@ -143,15 +154,15 @@ const getAccountsWithRefreshTokenForGivenUserId = (userId, cb) => {
                         } else {
                             cb(insertUpdateAccessTokenResponse);
                         }
-                    })
-
-
+                    });
                 } else { //don't have access token'
                     cb(refreshTokenResponse);
                 }
             });
 
         } else {
+            response.statusCode = 0; //override status code as refresh token not found
+            response.message = "Authrization tokens not found";
             cb(response)
         }
     }); //end of getUserHandler
@@ -331,20 +342,16 @@ const userHandler = {
             const userId = request.payload.userId;
             delete request.payload.userId;
             //user don't have access token and refresh token'
-            citiAuthHandler.authToken(request.payload, function (error, body) {
-                log.info("autho tocken service response body " + JSON.stringify(body));
+            citiAuthHandler.authToken(request.payload, function (error, tokenBody) {
                 if (error) {
                     response.statusCode = 0;
                     response.message = " access token service failed";
-                } else if (null != body) //success case 
+                } else if (null != tokenBody) //success case 
                 {
-                    const tokenBody = JSON.parse(body);
                     if (null != tokenBody.access_token && null != tokenBody.refresh_token) //access_token available 
                     {
                         //good to go for insert /update
-
-
-                        insertUpdateAccessToken(userId, tokenBody.access_token, (accessTokenUpsertResponse) => {
+                        insertUpdateAccessToken(userId, tokenBody.access_token, tokenBody.refresh_token, (accessTokenUpsertResponse) => {
 
                             //now try to update refresh token under user profile collection
                             const userDataPayload = {};
@@ -352,17 +359,16 @@ const userHandler = {
                             userDataPayload.refresh_token = tokenBody.refresh_token;
                             userCreateUpdateTransaction(userDataPayload, function (userInsertUpdateResponse) {
                                 response.message = accessTokenUpsertResponse.message + ", " + userInsertUpdateResponse.message;
-                                cb(response);
+                                reply(response);
                             });
                         });
-                        //------------
-                        //////////////////////
+
                     } else { //access_token/refresh_token null
                         response.statusCode = 0;
                         response.message = " access token service successful but access_token or refresh_token null";
                         reply(response);
                     }
-                } else //response body null
+                } else //response tokenBody null
                 {
                     response.statusCode = 0;
                     response.message = " access token service called but didn't recive expected result ";
@@ -398,15 +404,15 @@ const userHandler = {
     } //end of module exports
 module.exports = userHandler;
 //test
-let req = {
-    params: {
-        userId: "11203502946677381"
-    }
-};
-let reply = function (obj) {
-    log.info({
-        re: obj
-    }, "test repy ")
-}
+// let req = {
+//     params: {
+//         userId: "11203502946677381"
+//     }
+// };
+// let reply = function (obj) {
+//     log.info({
+//         re: obj
+//     }, "test repy ")
+// }
 
-userHandler.getUserAccounts(req, reply);
+// userHandler.getUserAccounts(req, reply);

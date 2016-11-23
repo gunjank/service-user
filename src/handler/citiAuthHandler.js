@@ -21,14 +21,21 @@ const authTokenHandler = {
             form: formData,
             headers: authorizationHeaders(),
         }, function (error, response, body) {
-            if (error) log.error("authToken service failed " + error);
-            if (response) log.info("authToken service successful and response status message is " + response.statusMessage);
-            if (body != null) {
-                cb(null, body);
-            } else {
-                log.info("authToken service - body is null");
+
+            if (error) {
+                log.error({
+                    error: error
+                }, "authToken service failed ");
                 cb(error, null);
-            }
+            } else if (response.statusCode === 200) { //valid json body 
+                log.info("authToken service successful");
+                cb(null, JSON.parse(body));
+            } else { //non 200 status
+                log.error({
+                    error: response
+                }, "authToken service successful but unexpected statusCode  ");
+                cb(response, null);
+            };
         });
     },
 
@@ -39,14 +46,20 @@ const authTokenHandler = {
             form: formData,
             headers: authorizationHeaders(),
         }, function (error, response, body) {
-            if (error) log.error("authTokenRefresh service failed " + error);
-            if (response) log.info("authTokenRefresh service successful and response status message is " + response.statusMessage);
-            if (body != null) {
-                cb(null, body);
-            } else {
-                log.info("authTokenRefresh service - body is null");
+            if (error) {
+                log.error({
+                    error: error
+                }, "authTokenRefresh service failed ");
                 cb(error, null);
-            }
+            } else if (response.statusCode === 200) { //valid json body 
+                log.info("authTokenRefresh service successful");
+                cb(null, JSON.parse(body));
+            } else { //non 200 status
+                log.error({
+                    error: response
+                }, "authTokenRefresh service successful but unexpected statusCode  ");
+                cb(response, null);
+            };
         });
     },
 

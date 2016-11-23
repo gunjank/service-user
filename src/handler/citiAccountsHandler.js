@@ -24,17 +24,19 @@ const accountsHandler = {
             headers: authorizationHeaders(accessToken),
         }, function (error, response, body) {
             if (error) {
-                log.error("getUserAccounts service failed " + error);
-            }
-            if (response) {
-                log.info("getUserAccounts service successful and response status message is " + response.statusMessage);
-            }
-            if (body != null) {
-                cb(null, body);
-            } else {
-                log.info("getUserAccounts service - body is null");
+                log.error({
+                    error: error
+                }, "getUserAccounts service failed ");
                 cb(error, null);
-            }
+            } else if (response.statusCode === 200) { //valid json body 
+                log.info("getUserAccounts service successful ");
+                cb(null, JSON.parse(body));
+            } else { //non 200 status
+                log.error({
+                    error: response
+                }, "getUserAccounts service successful but unexpected statusCode  ");
+                cb(response, null);
+            };
         });
     },
 

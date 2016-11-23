@@ -7,20 +7,12 @@
 </head>
 
 <body>
-    Citi Auth
     <div id="msg">
     </div>
-    <input type="button" name="closeBrowser" value="closeBrowser" onclick="requestCloseBrowser()">
     <a href="javascript:window.open('','_self').close();">close</a>
     <script>
-     var m= document.getElementById("msg");   
-    // var urlParam = location.search.substr(1).split("&").forEach(function(item) {   
-    //    m.innerHTML = m.innerHTML + "  <br> "+ item;
-
-    // });
-
-
-  var callAuthToken = true;
+     var m= document.getElementById("msg");    
+     var callAuthToken = true;
 
 function loadXMLDoc(code) {
     var xmlhttp = new XMLHttpRequest();
@@ -28,13 +20,9 @@ function loadXMLDoc(code) {
         if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
             callAuthToken =false;
            if (xmlhttp.status == 200) {
-               m.innerHTML = m.innerHTML + "  <br> "+ xmlhttp.responseText;
-           }
-           else if (xmlhttp.status == 400) {
-              alert('There was an error 400');
-           }
-           else {
-               alert('something else other than 200 was returned');
+               m.innerHTML = "Congrats!! You are all set, please close this page.";
+           }else{
+              m.innerHTML = 'There was an error, please close this page and try again.';
            }
         }
     };
@@ -57,13 +45,8 @@ if(callAuthToken==true){
         m.innerHTML = m.innerHTML + "  <br> "+ "missing expected state";
     } else{
         loadXMLDoc(code,state);
+    }
 }
-}
-
-
- 
-
-
 </script>
 </body>
 

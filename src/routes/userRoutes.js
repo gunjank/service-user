@@ -70,7 +70,7 @@ module.exports = function (server, options) {
             path: '/v1/user',
             config: {
                 handler: userHandler.createOrUpdateUser,
-                description: 'update  usser if already exist',
+                description: 'update  user if already exist',
                 notes: 'given user id should be present in db',
                 tags: ['api'],
                 validate: {
@@ -89,7 +89,7 @@ module.exports = function (server, options) {
             path: '/v1/user/{userId}',
             config: {
                 handler: userHandler.getUser,
-                description: 'get  usser if already exist by user id',
+                description: 'get  user if already exist by user id',
                 notes: 'given user id should be present in db',
                 tags: ['api'],
                 validate: {
@@ -106,7 +106,7 @@ module.exports = function (server, options) {
         //     path: '/v1/user/{userId}/favourite',
         //     config: {
         //         handler: userHandler.getUserFavourite,
-        //         description: 'get  usser if already exist by user id',
+        //         description: 'get  user if already exist by user id',
         //         notes: 'given user id should be present in db',
         //         tags: ['api'],
         //         validate: {
@@ -124,8 +124,8 @@ module.exports = function (server, options) {
             path: '/v1/user/{userId}/address/{type}',
             config: {
                 handler: userHandler.getUserAddressByType,
-                description: 'get  usser if already exist by user id',
-                notes: 'given user id should be present in db',
+                description: 'Get  user address if already exist for given user id',
+                notes: 'Given user id and address type should be present in db',
                 tags: ['api'],
                 validate: {
                     params: {
@@ -142,7 +142,7 @@ module.exports = function (server, options) {
             path: '/v1/user/{userId}',
             config: {
                 handler: userHandler.removeUser,
-                description: 'remove usser if already exist',
+                description: 'remove user if already exist',
                 notes: 'given user id should be present in db',
                 tags: ['api'],
                 validate: {
