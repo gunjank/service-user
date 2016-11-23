@@ -5,7 +5,6 @@ const log = require('../config/logger'),
     settings = require('../config/settings'),
     uuid = require('node-uuid');
 
-
 const authorizationHeaders = function (accessToken) {
     return {
         "Authorization": "Bearer " + accessToken,
@@ -14,7 +13,6 @@ const authorizationHeaders = function (accessToken) {
         "client_id": settings.citiClientId
     }
 };
-
 
 const accountsHandler = {
     getUserAccounts: function (accessToken, cb) {
@@ -39,20 +37,6 @@ const accountsHandler = {
             };
         });
     },
-
-
-
-
 }
 
-//test
-// console.log(authorizationHeaders());
-// let payloadData = {
-//     grant_type: "authorization_code",
-//     code: "AAJEsqoJ3KgZV0FLLAEgOia3zypaco1NxosgFsuTcE7HcfUvkJR18_mpSrne7Q1yEKF1RxS5KFxSHi9S6adr6z45xhzD_LYNgjBBlMK8-u0JuCT1c_xXZl7F3PwDIVXwZZHwHhSV5NQibeiC-oBhNaE1WJZ4ijooYwJ9Q8SNvfvUGxtveEK1vaEqVunrK_zKfqi5tYCdh9clvt4MzuukLXb696GITolM_KpMgTZyK4Q3Tw",
-//     redirect_uri: "https://service-user.cfapps.io"
-// };
-// authTokenHandler.authToken(payloadData, function (error, body) {
-//     console.log("response from authCode " + error + " --  " + JSON.stringify(body));
-// });
 module.exports = accountsHandler;

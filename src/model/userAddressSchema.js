@@ -1,8 +1,8 @@
 'use strict';
 
-var mongoose = require('../dao/db');
+const mongoose = require('../dao/db');
 
-let schema = new mongoose.Schema({
+const schema = new mongoose.Schema({
     user_id: String,
     lon: Number,
     lat: Number,

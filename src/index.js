@@ -1,6 +1,6 @@
 'use strict';
 
-let log = require('./config/logger'),
+const log = require('./config/logger'),
   path = require('path'),
   Lout = require('lout'),
   Good = require('good'),
@@ -16,7 +16,7 @@ let log = require('./config/logger'),
 /**
  * Construct the server
  */
-let server = new Hapi.Server({
+const server = new Hapi.Server({
   connections: {
     routes: {
       cors: true,
@@ -32,14 +32,11 @@ log.info('server constructed');
 /**
  * Create the connection
  */
-// port: config.port
-
 server.connection({
   port: settings.port
 
 });
-//debug('added port: ', config.port);
-let swaggerOptions = {
+const swaggerOptions = {
   info: {
     'title': 'Service-User API Documentation',
     'version': Pack.version
@@ -50,16 +47,14 @@ server.register([Inert, Vision, {
   'register': HapiSwagger,
   'options': swaggerOptions
 }], function (err) {
-  if (err) log.info("Inert or Vision plugin failed, it will stop swagger");
+  if (err)
+    log.info("Inert or Vision plugin failed, it will stop swagger");
 });
-
-
-
 
 /**
  * Build a logger for the server & each service
  */
-let reporters = [new GoodFile({
+const reporters = [new GoodFile({
   log: '*'
 }, __dirname + '/../logs/server.log')];
 
@@ -85,9 +80,12 @@ server.register({
     reporters: reporters
   }
 }, function (err) {
-  if (err) throw new Error(err);
+  if (err)
+    throw new Error(err);
 
-  log.debug('registered Good for logging with reporters: ', reporters);
+  log.debug({
+    reporters: reporters
+  }, 'registered Good for logging with reporters');
 });
 
 /**
@@ -96,7 +94,8 @@ server.register({
 server.register({
   register: Lout
 }, function (err) {
-  if (err) throw new Error(err);
+  if (err)
+    throw new Error(err);
 
   log.debug('added Lout for /docs');
 });
@@ -106,17 +105,19 @@ server.register({
  */
 
 server.start(function (err) {
-  if (err) throw new Error(err);
+  if (err)
+    throw new Error(err);
   log.info('server started!');
-  let summary = server.connections.map(function (cn) {
+  const summary = server.connections.map(function (cn) {
     return {
       labels: cn.settings.labels,
       uri: cn.info.uri
     };
   });
-  let userRouter = require(__dirname + '/routes/userRoutes')(server);
-  console.log(summary);
-  log.info('Connections: ', summary);
+  require(__dirname + '/routes/userRoutes')(server); //initialize router
+  log.info({
+    connSummary: summary
+  }, 'Connections summary ');
   server.log('server', 'started: ' + JSON.stringify(summary));
 });
 

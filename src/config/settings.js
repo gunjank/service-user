@@ -1,15 +1,14 @@
 'use strict';
 
-const cfenv = require("cfenv");
-const appEnv = cfenv.getAppEnv();
-const base64 = require('base-64');
-const log = require('./logger');
+const cfenv = require("cfenv"),
+    appEnv = cfenv.getAppEnv(),
+    base64 = require('base-64'),
+    log = require('./logger');
 let mLabService = appEnv.getService('mongo_cb');
 let citiAuth = appEnv.getService('citi_auth');
 let mLabServiceUrl = "";
 let citiClientCredentials = null;
 let clientIdAndSecretBase64 = null;
-
 
 const mLabServiceCredentials = function () {
     //** local testing **//
@@ -47,7 +46,6 @@ const initialize = function () { //intilize all bootstrapping credentials
     getClientIdAndSecretBase64();
     mLabServiceCredentials();
 }
-
 
 const settings = {
     init: initialize(), //this will make sure we have citiAuth credentials

@@ -1,6 +1,6 @@
 'use strict';
 
-let Response = function () {}
+const Response = function () {}
 Response.prototype.statusCode = function (statusCode) {
     this.statusCode = statusCode;
 }

@@ -1,8 +1,8 @@
 'use strict';
 
-var mongoose = require('../dao/db');
+const mongoose = require('../dao/db');
 
-let schema = new mongoose.Schema({
+const schema = new mongoose.Schema({
     "createdAt": {
         type: Date,
         expires: 3530, //access token expires_in=3600

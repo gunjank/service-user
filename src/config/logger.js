@@ -1,9 +1,10 @@
 'use strict';
 
-const bunyan = require('bunyan');
-//log class will now globally available
+const bunyan = require('bunyan'),
+    Pack = require('../../package');
+
 const log = bunyan.createLogger({
-    name: 'service-user',
+    name: Pack.name,
     serializers: bunyan.stdSerializers
 });
 

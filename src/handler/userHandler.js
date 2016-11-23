@@ -169,15 +169,7 @@ const getAccountsWithRefreshTokenForGivenUserId = (userId, cb) => {
 }; //end of getAccountsWithRefreshTokenForGivenUserId
 
 
-
-
-
-
-
-
-
 // //exports start
-
 const userHandler = {
 
         createOrUpdateUser: function (request, reply) {
@@ -403,16 +395,3 @@ const userHandler = {
             } //end of method getUserAccounts
     } //end of module exports
 module.exports = userHandler;
-//test
-// let req = {
-//     params: {
-//         userId: "11203502946677381"
-//     }
-// };
-// let reply = function (obj) {
-//     log.info({
-//         re: obj
-//     }, "test repy ")
-// }
-
-// userHandler.getUserAccounts(req, reply);
